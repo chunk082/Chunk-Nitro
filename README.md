@@ -1,4 +1,4 @@
-# Nitro React v2.5
+# Chunk Nitro
 
 ## Prerequisites
 
