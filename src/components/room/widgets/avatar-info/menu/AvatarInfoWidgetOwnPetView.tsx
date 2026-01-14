@@ -81,19 +81,19 @@ export const AvatarInfoWidgetOwnPetView: FC<AvatarInfoWidgetOwnPetViewProps> = p
                     roomSession.removePetSaddle(avatarInfo.id);
                     break;
                 case 'breed':
-                    if(mode === MODE_NORMAL)
-                    {
-                    // _local_7 = RoomWidgetPetCommandMessage._Str_16282;
-                    // _local_8 = ("pet.command." + _local_7);
-                    // _local_9 = _Str_2268.catalog.localization.getLocalization(_local_8);
-                    // _local_4 = new RoomWidgetPetCommandMessage(RoomWidgetPetCommandMessage.RWPCM_PET_COMMAND, this._Str_594.id, ((this._Str_594.name + " ") + _local_9));
-                    }
-
+                {
+                    if(mode === MODE_NORMAL && avatarInfo && roomSession)
+                {
+                    roomSession.sendChatMessage(`${ avatarInfo.name } Breed`, 0);
+                }
+                /*
                     else if(mode === MODE_MONSTER_PLANT)
-                    {
-                        // messageType = RoomWidgetUserActionMessage.REQUEST_BREED_PET;
-                    }
-                    break;
+                {
+                    // Monster Plant breeding not implemented
+                }
+                */
+                break;
+                }
                 case 'harvest':
                     roomSession.harvestPet(avatarInfo.id);
                     break;
