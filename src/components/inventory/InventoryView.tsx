@@ -10,12 +10,12 @@ import { InventoryTradeView } from './views/furniture/InventoryTradeView';
 import { InventoryPetView } from './views/pet/InventoryPetView';
 
 const TAB_FURNITURE: string = 'inventory.furni';
-//const TAB_RARES: string ='inventory.rares';
-//const TAB_CLOTHING: string ='inventory.clothing';
+const TAB_RARES: string ='inventory.rares';
+const TAB_CLOTHING: string ='inventory.clothing';
 const TAB_BOTS: string = 'inventory.bots';
 const TAB_PETS: string = 'inventory.furni.tab.pets';
 const TAB_BADGES: string = 'inventory.badges';
-const TABS = [ TAB_FURNITURE, /*TAB_RARES, TAB_CLOTHING,*/ TAB_BOTS, TAB_PETS, TAB_BADGES ];
+const TABS = [ TAB_FURNITURE, TAB_RARES, TAB_CLOTHING, TAB_BOTS, TAB_PETS, TAB_BADGES ];
 const UNSEEN_CATEGORIES = [ UnseenItemCategory.FURNI, UnseenItemCategory.RARES, UnseenItemCategory.CLOTHING ,UnseenItemCategory.BOT, UnseenItemCategory.PET, UnseenItemCategory.BADGE ];
 
 export const InventoryView: FC<{}> = props =>
@@ -137,10 +137,10 @@ export const InventoryView: FC<{}> = props =>
                     <NitroCardContentView>
                         { (currentTab === TAB_FURNITURE ) &&
                             <InventoryFurnitureView roomSession={ roomSession } roomPreviewer={ roomPreviewer } /> }
-                      {/* { (currentTab === TAB_RARES) &&
+                       { (currentTab === TAB_RARES) &&
                             <InventoryFurnitureView roomSession={ roomSession } roomPreviewer={ roomPreviewer } /> }
                         { (currentTab === TAB_CLOTHING ) && 
-                            <InventoryFurnitureView roomSession={ roomSession } roomPreviewer={ roomPreviewer } /> } */}
+                            <InventoryFurnitureView roomSession={ roomSession } roomPreviewer={ roomPreviewer } /> }
                         { (currentTab === TAB_BOTS ) &&
                             <InventoryBotView roomSession={ roomSession } roomPreviewer={ roomPreviewer } /> }
                         { (currentTab === TAB_PETS ) && 
