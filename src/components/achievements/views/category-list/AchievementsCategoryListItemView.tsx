@@ -24,7 +24,7 @@ export const AchievementsCategoryListItemView: FC<AchievementCategoryListItemVie
         <LayoutGridItem itemActive={ (selectedCategoryCode === category.code) } itemCount={ getTotalUnseen } itemCountMinimum={ 0 } gap={ 1 } onClick={ event => setSelectedCategoryCode(category.code) }>
             <Text fullWidth center small className="pt-1">{ LocalizeText(`quests.${ category.code }.name`) }</Text>
             <LayoutBackgroundImage position="relative" imageUrl={ getCategoryImage }>
-                <Text fullWidth center position="absolute" variant="white" style={ { fontSize: 12, bottom: 9 } }>{ progress } / { maxProgress }</Text>
+                <Text fullWidth center position="absolute" variant="white" style={{ fontSize: 12, bottom: 5, fontWeight: 'bold' }}>{ progress } / { maxProgress }</Text>
             </LayoutBackgroundImage>
         </LayoutGridItem>
     );

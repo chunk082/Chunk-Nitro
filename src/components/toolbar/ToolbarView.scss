@@ -76,33 +76,98 @@
         border: none;
     }
 
-    .navigation-item {
-        position: relative;
+.navigation-item {
+    position: relative;
 
-        &.item-avatar {
-            width: 50px;
-            height: 45px;
-            overflow: hidden;
+    // Hover for regular navigation items (not avatar)
+    &:hover:not(.item-avatar) {
+        transform: translate(-1px, -1px);
+        filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.8));
+    }
 
-            .avatar-image {
-                margin-left: -5px;
-                margin-top: 25px;
+    &.item-avatar {
+    position: relative;
+    width: 50px;
+    height: 50px; // Changed from 45px
+    overflow: visible;
+
+    // Dark background circle
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 50px; // Changed from 38px
+        height: 50px; // Changed from 38px
+        background: url(@/assets/images/toolbar/icons/me-menu/memenu_bg.png) no-repeat center;
+        background-size: contain;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    // Avatar container
+    .avatar-image,
+    .layout-avatar-image,
+    [class*='layout-avatar-image'] {
+        position: absolute;
+        top: -20px;
+        left: -1px;
+        width: 50px;
+        //height: auto;
+        clip-path: circle(42px at 26px 22px);
+        z-index: 2;
+    }
+
+    // Outer ring (on top)
+    &::after {
+        content: '';
+        position: absolute;
+        top: -3;
+        left: 4;
+        width: 45px; // Changed from 38px
+        height: 45px; // Changed from 38px
+        background: url(@/assets/images/toolbar/icons/me-menu/memenu_circle.png) no-repeat center;
+        background-size: contain;
+        z-index: 3;
+        pointer-events: none;
+    }
+
+    // Hover state - applies to ALL children
+        &:hover {
+            &::before,
+            &::after {
+                transform: translate(-1px, -1px);
+                filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.8));
+            }
+
+            // Avatar image hover
+            .avatar-image,
+            .layout-avatar-image,
+            [class*='layout-avatar-image'] {
+                transform: translate(-1px, -1px);
+                filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.8));
             }
         }
 
-        &:hover {
-            -webkit-transform: translate(-1px, -1px);
-            transform: translate(-1px, -1px);
-            filter: drop-shadow(2px 2px 0 rgba($black, 0.8));
-        }
-
+        // Active/clicked state - reset ALL
         &.active,
         &:active {
-            -webkit-transform: unset;
-            transform: unset;
-            filter: none;
+            &::before,
+            &::after {
+                transform: none;
+                filter: none;
+            }
+
+            .avatar-image,
+            .layout-avatar-image,
+            [class*='layout-avatar-image'] {
+                transform: none;
+                filter: none;
+            }
         }
     }
+}
+
 
     #toolbar-chat-input-container {
 
