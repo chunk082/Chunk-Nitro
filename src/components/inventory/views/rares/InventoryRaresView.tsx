@@ -30,19 +30,20 @@ export const InventoryRaresView: FC<InventoryRaresViewProps> = props =>
     const { roomSession = null, roomPreviewer = null } = props;
     const [ isVisible, setIsVisible ] = useState(false);
     const [ filteredGroupItems, setFilteredGroupItems ] = useState<GroupItem[]>([]);
-    const { groupItems = [], selectedItem = null, activate = null, deactivate = null } = useInventoryFurni();
+    const { groupItems: allGroupItems = [], selectedItem = null, activate = null, deactivate = null } = useInventoryFurni();
     const { resetItems = null } = useInventoryUnseenTracker();
 
-    useEffect(() =>
-        {
-            const rareItems = groupItems.filter(group =>
-            {
-                const item = group.getLastItem() as { is_rare?: boolean };
-                return item && item.is_rare === true;
-            });
-        
-            setFilteredGroupItems(rareItems);
-        }, [ groupItems ]);
+    const groupItems = allGroupItems.filter(group =>
+{
+    const item = group.getLastItem();
+    if(!item) return false;
+
+    const furniData = GetSessionDataManager().getFloorItemData(item.type);
+    if(!furniData) return false;
+
+    return furniData.furniLine === 'rare';
+});
+
         
     useEffect(() =>
     {
@@ -126,7 +127,11 @@ export const InventoryRaresView: FC<InventoryRaresViewProps> = props =>
             <Column size={ 7 } overflow="hidden">
                 <InventoryRaresSearchView groupItems={ groupItems } setGroupItems={ setFilteredGroupItems } />
                 <AutoGrid columnCount={ 5 }>
-                    { filteredGroupItems && (filteredGroupItems.length > 0) && filteredGroupItems.map((item, index) => <InventoryRaresItemView key={ index } groupItem={ item } />) }
+                    { filteredGroupItems.length > 0 &&
+                                            filteredGroupItems.map((item, index) =>
+                                                <InventoryRaresItemView key={ index } groupItem={ item } />
+                                            )
+                                        }
                 </AutoGrid>
             </Column>
             <Column size={ 5 } overflow="auto">

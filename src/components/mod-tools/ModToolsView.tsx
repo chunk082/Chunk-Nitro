@@ -107,6 +107,9 @@ export const ModToolsView: FC<{}> = props =>
                     case 'toggle-user-chatlog':
                         toggleUserChatlog(Number(parts[2]));
                         return;
+                    case 'tickets':
+                        setIsTicketsVisible(true);
+                        return;
                 }
             },
             eventUrlPrefix: 'mod-tools/'

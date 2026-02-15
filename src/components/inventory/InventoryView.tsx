@@ -5,9 +5,11 @@ import { NitroCardContentView, NitroCardHeaderView, NitroCardTabsItemView, Nitro
 import { useInventoryTrade, useInventoryUnseenTracker, useMessageEvent, useRoomEngineEvent, useRoomSessionManagerEvent } from '../../hooks';
 import { InventoryBadgeView } from './views/badge/InventoryBadgeView';
 import { InventoryBotView } from './views/bot/InventoryBotView';
+import { InventoryClothingView } from './views/clothing/InventoryClothingView';
 import { InventoryFurnitureView } from './views/furniture/InventoryFurnitureView';
 import { InventoryTradeView } from './views/furniture/InventoryTradeView';
 import { InventoryPetView } from './views/pet/InventoryPetView';
+import { InventoryRaresView } from './views/rares/InventoryRaresView';
 
 const TAB_FURNITURE: string = 'inventory.furni';
 const TAB_RARES: string ='inventory.rares';
@@ -138,9 +140,9 @@ export const InventoryView: FC<{}> = props =>
                         { (currentTab === TAB_FURNITURE ) &&
                             <InventoryFurnitureView roomSession={ roomSession } roomPreviewer={ roomPreviewer } /> }
                        { (currentTab === TAB_RARES) &&
-                            <InventoryFurnitureView roomSession={ roomSession } roomPreviewer={ roomPreviewer } /> }
+                            <InventoryRaresView roomSession={ roomSession } roomPreviewer={ roomPreviewer } /> }
                         { (currentTab === TAB_CLOTHING ) && 
-                            <InventoryFurnitureView roomSession={ roomSession } roomPreviewer={ roomPreviewer } /> }
+                            <InventoryClothingView roomSession={ roomSession } roomPreviewer={ roomPreviewer } /> }
                         { (currentTab === TAB_BOTS ) &&
                             <InventoryBotView roomSession={ roomSession } roomPreviewer={ roomPreviewer } /> }
                         { (currentTab === TAB_PETS ) && 

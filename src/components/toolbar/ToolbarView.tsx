@@ -17,6 +17,7 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
     const { getTotalUnseen = 0 } = useAchievements();
     const { requests = [] } = useFriends();
     const { iconState = MessengerIconState.HIDDEN } = useMessenger();
+    const [ openIssue, setOpenIssue ] = useState(false);
     const isMod = GetSessionDataManager().isModerator;
     
     useMessageEvent<PerkAllowancesMessageEvent>(PerkAllowancesMessageEvent, event =>
@@ -98,6 +99,9 @@ export const ToolbarView: FC<{ isInRoom: boolean }> = props =>
                             <Base pointer className="navigation-item icon icon-camera" onClick={ event => CreateLinkEvent('camera/toggle') } /> }
                         { isMod &&
                             <Base pointer className="navigation-item icon icon-modtools" onClick={ event => CreateLinkEvent('mod-tools/toggle') } /> }
+                        { openIssue && isMod &&
+                            <Base pointer className="navigation-item icon icon-reports" onClick={ () => CreateLinkEvent('mod-tools/tickets') } />
+                        }
                     </Flex>
                 </Flex>
                 <Flex alignItems="center" gap={ 2 } className="toolbar-right-side">
