@@ -99,7 +99,7 @@ export const InventoryRaresView: FC<InventoryRaresViewProps> = props =>
     {
         if(!selectedItem || !selectedItem.hasUnseenItems) return;
 
-        resetItems(UnseenItemCategory.FURNI, selectedItem.items.map(item => item.id));
+        resetItems(UnseenItemCategory.RARES, selectedItem.items.map(item => item.id));
 
         selectedItem.hasUnseenItems = false;
     }, [ selectedItem, resetItems ]);

@@ -99,32 +99,43 @@ const useInventoryUnseenTrackerState = () =>
     }, []);
 
     useMessageEvent<UnseenItemsEvent>(UnseenItemsEvent, event =>
+{
+    const parser = event.getParser();
+
+    console.log("Unseen categories from server:", parser.categories);
+
+    for(const category of parser.categories)
     {
-        const parser = event.getParser();
+        console.log("Category:", category, "Items:", parser.getItemsByCategory(category));
+    }
 
-        setUnseenItems(prevValue =>
+    setUnseenItems(prevValue =>
+    {
+        const newValue = new Map(prevValue);
+
+        for(const category of parser.categories)
         {
-            const newValue = new Map(prevValue);
+            let existing = newValue.get(category);
 
-            for(const category of parser.categories)
+            if(!existing)
             {
-                let existing = newValue.get(category);
-
-                if(!existing)
-                {
-                    existing = [];
-
-                    newValue.set(category, existing);
-                }
-
-                const itemIds = parser.getItemsByCategory(category);
-
-                for(const itemId of itemIds) ((existing.indexOf(itemId) === -1) && existing.push(itemId));
+                existing = [];
+                newValue.set(category, existing);
             }
 
-            return newValue;
-        });
+            const itemIds = parser.getItemsByCategory(category);
+
+            for(const itemId of itemIds)
+            {
+                if(existing.indexOf(itemId) === -1)
+                    existing.push(itemId);
+            }
+        }
+
+        return newValue;
     });
+});
+
 
     return { getCount, getFullCount, resetCategory, resetItems, isUnseen, removeUnseen };
 }

@@ -98,13 +98,14 @@ export const InventoryClothingView: FC<InventoryClothingViewProps> = props =>
     }, [ roomPreviewer, selectedItem ]);
 
     useEffect(() =>
-    {
-        if(!selectedItem || !selectedItem.hasUnseenItems) return;
+{
+    if(!selectedItem || !selectedItem.hasUnseenItems) return;
 
-        resetItems(UnseenItemCategory.FURNI, selectedItem.items.map(item => item.id));
+    resetItems(UnseenItemCategory.CLOTHING, selectedItem.items.map(item => item.id));
 
-        selectedItem.hasUnseenItems = false;
-    }, [ selectedItem, resetItems ]);
+    selectedItem.hasUnseenItems = false;
+}, [ selectedItem, resetItems ]);
+
 
     useEffect(() =>
     {

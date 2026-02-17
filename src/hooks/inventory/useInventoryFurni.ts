@@ -1,7 +1,7 @@
 import { FurnitureListAddOrUpdateEvent, FurnitureListComposer, FurnitureListEvent, FurnitureListInvalidateEvent, FurnitureListItemParser, FurnitureListRemovedEvent, FurniturePostItPlacedEvent } from '@nitrots/nitro-renderer';
 import { useEffect, useState } from 'react';
 import { useBetween } from 'use-between';
-import { addFurnitureItem, attemptItemPlacement, cancelRoomObjectPlacement, CloneObject, CreateLinkEvent, DispatchUiEvent, FurnitureItem, getAllItemIds, getPlacingItemId, GroupItem, mergeFurniFragments, SendMessageComposer, UnseenItemCategory } from '../../api';
+import { addFurnitureItem, attemptItemPlacement, cancelRoomObjectPlacement, CloneObject, CreateLinkEvent, DispatchUiEvent, FurnitureItem, getAllItemIds, getPlacingItemId, GetSessionDataManager, GroupItem, mergeFurniFragments, SendMessageComposer, UnseenItemCategory } from '../../api';
 import { InventoryFurniAddedEvent } from '../../events';
 import { useMessageEvent } from '../events';
 import { useSharedVisibility } from '../useSharedVisibility';
@@ -52,147 +52,187 @@ const useInventoryFurniState = () =>
         return null;
     }
 
+    const getUnseenCategoryForItem = (item: FurnitureItem): number =>
+{
+    const furniData = GetSessionDataManager().getFloorItemData(item.type);
+
+    if(!furniData) return UnseenItemCategory.FURNI;
+
+    const className = furniData.className?.toLowerCase() || '';
+
+    if(furniData.furniLine === 'rare')
+        return UnseenItemCategory.RARES;
+
+    if(className.startsWith('clothing_'))
+        return UnseenItemCategory.CLOTHING;
+
+    return UnseenItemCategory.FURNI;
+};
+
     useMessageEvent<FurnitureListAddOrUpdateEvent>(FurnitureListAddOrUpdateEvent, event =>
+{
+    const parser = event.getParser();
+
+    setGroupItems(prevValue =>
     {
-        const parser = event.getParser();
+        const newValue = [ ...prevValue ];
 
-        setGroupItems(prevValue =>
+        for(const itemParser of parser.items)
         {
-            const newValue = [ ...prevValue ];
+            let i = 0;
+            let groupItem: GroupItem = null;
 
-            for(const item of parser.items)
+            while(i < newValue.length)
             {
-                let i = 0;
-                let groupItem: GroupItem = null;
+                const group = newValue[i];
 
-                while(i < newValue.length)
+                let j = 0;
+
+                while(j < group.items.length)
                 {
-                    const group = newValue[i];
+                    const furniture = group.items[j];
 
-                    let j = 0;
-
-                    while(j < group.items.length)
+                    if(furniture.id === itemParser.itemId)
                     {
-                        const furniture = group.items[j];
+                        furniture.update(itemParser);
 
-                        if(furniture.id === item.itemId)
-                        {
-                            furniture.update(item);
+                        const newFurniture = [ ...group.items ];
+                        newFurniture[j] = furniture;
 
-                            const newFurniture = [ ...group.items ];
+                        group.items = newFurniture;
 
-                            newFurniture[j] = furniture;
+                        groupItem = group;
 
-                            group.items = newFurniture;
-
-                            groupItem = group;
-
-                            break;
-                        }
-
-                        j++
+                        break;
                     }
 
-                    if(groupItem) break;
-
-                    i++;
+                    j++;
                 }
 
-                if(groupItem)
-                {
-                    groupItem.hasUnseenItems = true;
+                if(groupItem) break;
 
-                    newValue[i] = CloneObject(groupItem);
-                }
-                else
-                {
-                    const furniture = new FurnitureItem(item);
-
-                    addFurnitureItem(newValue, furniture, isUnseen(UnseenItemCategory.FURNI, item.itemId));
-
-                    DispatchUiEvent(new InventoryFurniAddedEvent(furniture.id, furniture.type, furniture.category));
-                }
+                i++;
             }
 
-            return newValue;
-        });
+            if(groupItem)
+            {
+                groupItem.hasUnseenItems = true;
+                newValue[i] = CloneObject(groupItem);
+            }
+            else
+            {
+                const furniture = new FurnitureItem(itemParser);
+
+                const category = getUnseenCategoryForItem(furniture);
+
+                addFurnitureItem(
+                    newValue,
+                    furniture,
+                    isUnseen(category, furniture.id)
+                );
+
+                DispatchUiEvent(
+                    new InventoryFurniAddedEvent(
+                        furniture.id,
+                        furniture.type,
+                        furniture.category
+                    )
+                );
+            }
+        }
+
+        return newValue;
     });
+});
+
 
     useMessageEvent<FurnitureListEvent>(FurnitureListEvent, event =>
+{
+    const parser = event.getParser();
+    
+    if(!furniMsgFragments) furniMsgFragments = new Array(parser.totalFragments);
+
+    const fragment = mergeFurniFragments(
+        parser.fragment,
+        parser.totalFragments,
+        parser.fragmentNumber,
+        furniMsgFragments
+    );
+
+    if(!fragment) return;
+
+    setGroupItems(prevValue =>
     {
-        const parser = event.getParser();
-        
-        if(!furniMsgFragments) furniMsgFragments = new Array(parser.totalFragments);
+        const newValue = [ ...prevValue ];
+        const existingIds = getAllItemIds(newValue);
 
-        const fragment = mergeFurniFragments(parser.fragment, parser.totalFragments, parser.fragmentNumber, furniMsgFragments);
-
-        if(!fragment) return;
-
-        setGroupItems(prevValue =>
+        for(const existingId of existingIds)
         {
-            const newValue = [ ...prevValue ];
-            const existingIds = getAllItemIds(newValue);
+            if(fragment.get(existingId)) continue;
 
-            for(const existingId of existingIds)
+            let index = 0;
+
+            while(index < newValue.length)
             {
-                if(fragment.get(existingId)) continue;
+                const group = newValue[index];
+                const item = group.remove(existingId);
 
-                let index = 0;
-
-                while(index < newValue.length)
+                if(!item)
                 {
-                    const group = newValue[index];
-                    const item = group.remove(existingId);
-
-                    if(!item)
-                    {
-                        index++;
-
-                        continue;
-                    }
-                        
-                    if(getPlacingItemId() === item.ref)
-                    {
-                        cancelRoomObjectPlacement();
-
-                        if(!attemptItemPlacement(group))
-                        {
-                            CreateLinkEvent('inventory/show');
-                        }
-                    }
-
-                    if(group.getTotalCount() <= 0)
-                    {
-                        newValue.splice(index, 1);
-
-                        group.dispose();
-                    }
-
-                    break;
+                    index++;
+                    continue;
                 }
+                    
+                if(getPlacingItemId() === item.ref)
+                {
+                    cancelRoomObjectPlacement();
+
+                    if(!attemptItemPlacement(group))
+                        CreateLinkEvent('inventory/show');
+                }
+
+                if(group.getTotalCount() <= 0)
+                {
+                    newValue.splice(index, 1);
+                    group.dispose();
+                }
+
+                break;
             }
+        }
 
-            for(const itemId of fragment.keys())
-            {
-                if(existingIds.indexOf(itemId) >= 0) continue;
+        for(const itemId of fragment.keys())
+        {
+            if(existingIds.indexOf(itemId) >= 0) continue;
 
-                const parser = fragment.get(itemId);
+            const itemParser = fragment.get(itemId);
+            if(!itemParser) continue;
 
-                if(!parser) continue;
+            const furniture = new FurnitureItem(itemParser);
 
-                const item = new FurnitureItem(parser);
+            const category = getUnseenCategoryForItem(furniture);
 
-                addFurnitureItem(newValue, item, isUnseen(UnseenItemCategory.FURNI, itemId));
+            addFurnitureItem(
+                newValue,
+                furniture,
+                isUnseen(category, furniture.id)
+            );
 
-                DispatchUiEvent(new InventoryFurniAddedEvent(item.id, item.type, item.category));
+            DispatchUiEvent(
+                new InventoryFurniAddedEvent(
+                    furniture.id,
+                    furniture.type,
+                    furniture.category
+                )
+            );
+        }
 
-            }
-
-            return newValue;
-        });
-
-        furniMsgFragments = null;
+        return newValue;
     });
+
+    furniMsgFragments = null;
+});
+
 
     useMessageEvent<FurnitureListInvalidateEvent>(FurnitureListInvalidateEvent, event =>
     {
@@ -262,26 +302,6 @@ const useInventoryFurniState = () =>
             return newValue;
         });
     }, [ groupItems ]);
-
-    useEffect(() =>
-    {
-        if(!isVisible) return;
-
-        return () =>
-        {
-            if(resetCategory(UnseenItemCategory.FURNI))
-            {
-                setGroupItems(prevValue =>
-                {
-                    const newValue = [ ...prevValue ];
-        
-                    for(const newGroup of newValue) newGroup.hasUnseenItems = false;
-        
-                    return newValue;
-                });
-            }
-        }
-    }, [ isVisible, resetCategory ]);
 
     useEffect(() =>
     {
