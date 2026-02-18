@@ -76,98 +76,44 @@
         border: none;
     }
 
-.navigation-item {
+  .navigation-item {
     position: relative;
-
-    // Hover for regular navigation items (not avatar)
-    &:hover:not(.item-avatar) {
-        transform: translate(-1px, -1px);
-        filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.8));
-    }
 
     &.item-avatar {
-    position: relative;
-    width: 50px;
-    height: 50px; // Changed from 45px
-    overflow: visible;
+      background-image: url(@/assets/images/toolbar/icons/me-menu/me-circle.png);
+      width: 45px;
+      height: 45px;
+      overflow: hidden;
+      background-size: 45px 45px;
+      background-position: center;
+      background-repeat: no-repeat;
 
-    // Dark background circle
-    &::before {
-        content: '';
+      .avatar-image {
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 9999px;
+        background-position: -26px -35px !important;
+
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 50px; // Changed from 38px
-        height: 50px; // Changed from 38px
-        background: url(@/assets/images/toolbar/icons/me-menu/memenu_bg.png) no-repeat center;
-        background-size: contain;
+        top: 2.5px;                
+        left: 2.5px; 
         z-index: 1;
-        pointer-events: none;
+      }
     }
 
-    // Avatar container
-    .avatar-image,
-    .layout-avatar-image,
-    [class*='layout-avatar-image'] {
-        position: absolute;
-        top: -20px;
-        left: -1px;
-        width: 50px;
-        //height: auto;
-        clip-path: circle(42px at 26px 22px);
-        z-index: 2;
+    &:hover {
+      -webkit-transform: translate(-1px, -1px);
+      transform: translate(-1px, -1px);
+      filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.8));
     }
 
-    // Outer ring (on top)
-    &::after {
-        content: '';
-        position: absolute;
-        top: -3;
-        left: 4;
-        width: 45px; // Changed from 38px
-        height: 45px; // Changed from 38px
-        background: url(@/assets/images/toolbar/icons/me-menu/memenu_circle.png) no-repeat center;
-        background-size: contain;
-        z-index: 3;
-        pointer-events: none;
+    &:active,
+    &.active {
+      -webkit-transform: unset;
+      transform: unset;
+      filter: none;
     }
-
-    // Hover state - applies to ALL children
-        &:hover {
-            &::before,
-            &::after {
-                transform: translate(-1px, -1px);
-                filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.8));
-            }
-
-            // Avatar image hover
-            .avatar-image,
-            .layout-avatar-image,
-            [class*='layout-avatar-image'] {
-                transform: translate(-1px, -1px);
-                filter: drop-shadow(2px 2px 0 rgba(0, 0, 0, 0.8));
-            }
-        }
-
-        // Active/clicked state - reset ALL
-        &.active,
-        &:active {
-            &::before,
-            &::after {
-                transform: none;
-                filter: none;
-            }
-
-            .avatar-image,
-            .layout-avatar-image,
-            [class*='layout-avatar-image'] {
-                transform: none;
-                filter: none;
-            }
-        }
-    }
-}
-
+  }
 
     #toolbar-chat-input-container {
 
