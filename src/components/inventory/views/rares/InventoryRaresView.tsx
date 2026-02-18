@@ -3,7 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { attemptItemPlacement, DispatchUiEvent, FurniCategory, GetRoomEngine, GetSessionDataManager, GroupItem, LocalizeText, UnseenItemCategory } from '../../../../api';
 import { AutoGrid, Button, Column, Grid, LayoutLimitedEditionCompactPlateView, LayoutRarityLevelView, LayoutRoomPreviewerView, Text } from '../../../../common';
 import { CatalogPostMarketplaceOfferEvent } from '../../../../events';
-import { useInventoryFurni, useInventoryUnseenTracker } from '../../../../hooks';
+import { useInventoryRares, useInventoryUnseenTracker } from '../../../../hooks';
 import { InventoryCategoryEmptyView } from '../InventoryCategoryEmptyView';
 import { InventoryRaresItemView } from './InventoryRaresItemView';
 import { InventoryRaresSearchView } from './InventoryRaresSearchView';
@@ -30,7 +30,7 @@ export const InventoryRaresView: FC<InventoryRaresViewProps> = props =>
     const { roomSession = null, roomPreviewer = null } = props;
     const [ isVisible, setIsVisible ] = useState(false);
     const [ filteredGroupItems, setFilteredGroupItems ] = useState<GroupItem[]>([]);
-    const { groupItems: allGroupItems = [], selectedItem = null, activate = null, deactivate = null } = useInventoryFurni();
+    const { groupItems: allGroupItems = [], selectedItem = null, activate = null, deactivate = null } = useInventoryRares();
     const { resetItems = null } = useInventoryUnseenTracker();
 
     const groupItems = allGroupItems.filter(group =>
